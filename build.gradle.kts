@@ -1,6 +1,9 @@
 plugins {
     kotlin("jvm") version "2.2.20"
-    application
+    kotlin("plugin.spring") version "2.2.20"
+
+    id("org.springframework.boot") version "3.5.5"
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "org.example"
@@ -11,39 +14,32 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
+
+    // Spring Boot
+    implementation("org.springframework.boot:spring-boot-starter-web")
+
+    // Kotlin
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    // Your existing SQLite dependency
     implementation("org.xerial:sqlite-jdbc:3.45.1.0")
+
+    // Your existing logging dependency
     implementation("org.slf4j:slf4j-nop:2.0.9")
 
+    // Testing
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(kotlin("test"))
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
 kotlin {
-    jvmToolchain(11)
-}
-
-
-tasks.jar {
-    manifest {
-        attributes["Main-Class"] = "org.example.MainKt"
-    }
-
-    // Build a fat JAR: bundle the SQLite JDBC driver's classes directly
-    // into the output JAR so `java -jar` works standalone, with no
-    // classpath setup required by the end user.
-    from({
-        configurations.runtimeClasspath.get().filter { it.exists() }.map {
-            if (it.isDirectory) it else zipTree(it)
-        }
-    }) {
-        exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
-    }
-
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    jvmToolchain(17)
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+springBoot {
+    mainClass.set("org.example.CalculatorApplicationKt")
 }
