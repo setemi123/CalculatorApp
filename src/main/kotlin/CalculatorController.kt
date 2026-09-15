@@ -126,4 +126,12 @@ class CalculatorController {
             value
         )
     }
+
+    @GetMapping("/evaluate")
+    fun evaluate(
+        @RequestParam expression: String
+    ): EvalResult {
+        return evaluateExpression(expression)
+    }
+
 }
